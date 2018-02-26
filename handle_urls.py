@@ -10,6 +10,7 @@ import random
 import requests
 import time
 import logging
+
 import config
 
 order = "6fe364e27f29ff8e83f0cae046bd18c8";
@@ -51,6 +52,7 @@ def handle_url(_url, _choose, _value):
     chrome_options.add_argument('--disable-javascript')
     chrome_options.add_argument('--disable-plugins')
     chrome_options.add_argument('--disable-extensions')
+    # chrome_options.add_argument('--window-size=800,600')
     # chrome_options.add_extension('/home/spider/AdBlock_v3.24.0.crx')
     prefs = {'profile.default_content_setting_values': {'images': 2}}
     chrome_options.add_experimental_option('prefs', prefs)
@@ -68,6 +70,7 @@ def handle_url(_url, _choose, _value):
     try:
         driver.get(_url)
     except Exception, e:
+        logging.info(e)
         pass
     # 显式等待（0.5秒查询一次，查询5秒，共查询10次）
     # EC.presence_of_all_elements_located（复数形式，查到所有的通过）
