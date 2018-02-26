@@ -1,10 +1,8 @@
 # coding=utf-8
 from bs4 import BeautifulSoup
 import multiprocessing
-import re
 import logging
 import handle_mysqldb
-import handle_urls
 
 # 默认头URL
 basic_url = 'https://www.archdaily.cn'
@@ -14,38 +12,30 @@ logging.basicConfig(filename='/home/spider/logs/parse_page.log', level=logging.I
 
 db = handle_mysqldb.mysqldb()
 
-
-def parse_page(page_url, id):
+def parse_page(page_source, id):
     try:
-        page = handle_urls.handle_url(page_url, 'byclass', 'afd-search-list__link')
-        if page is not None:
-            soup = BeautifulSoup(page, 'lxml')
-            links = soup.find_all('a', class_='afd-search-list__link')
-            if links is not None:
-                for link in links:
-                    hrefurl = link['href']
-                    linkurl = basic_url + hrefurl
-                    # title = link.find('img')['alt']
-                    # title = re.sub("[\s+\.\!\/_,$%^*(+\"\')]+|[+——()?【】“”！，。？、~@#￥%……&*（）]+", "", name)
-                    insert_sql = "insert into link_urls(link_url) values('%s')" % (linkurl)
-                    db.insert_mysql(insert_sql)
-                    update_sql = "update page_urls set status=1 where id=%s" % (id)
-                    db.update_mysql(update_sql)
+        soup = BeautifulSoup(page_source, 'lxml')
+        links = soup.find_all('a', class_='afd-search-list__link')
+        if links is not None:
+            for link in links:
+                hrefurl = link['href']
+                linkurl = basic_url + hrefurl
+                insert_sql = "insert into link_urls(page_id,link_url) values(%s,'%s')" % (id,linkurl)
+                db.insert_mysql(insert_sql)
+            update_sql = "update page_urls set status=2 where id=%s" % (id)
+            db.update_mysql(update_sql)
     except Exception, e:
         logging.info(e)
-        logging.info('links is: ' + links)
-        logging.info('page_url is: ' + page_url)
-        logging.info('hrefurl is: ' + hrefurl)
 
 
 if __name__ == '__main__':
-    pool = multiprocessing.Pool(processes=20)
-    select_sql = "select id,page_url from page_urls where status=0"
+    pool = multiprocessing.Pool(processes=4)
+    select_sql = "select id,page_source from page_urls where status=1"
     res = db.select_mysql(select_sql)
     for row in res:
         id = row[0]
-        page_url = row[1]
-        pool.apply_async(parse_page, (page_url, id))
+        page_source = row[1]
+        pool.apply_async(parse_page, (page_source, id))
 
     logging.info("Started processes")
     pool.close()

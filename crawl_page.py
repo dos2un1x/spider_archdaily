@@ -4,19 +4,16 @@ import multiprocessing
 import logging
 import handle_mysqldb
 import handle_urls
+import config
 
-# 默认头URL
-start_url = 'https://www.archdaily.cn/cn/search/projects'
-
-LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
-logging.basicConfig(filename='/home/spider/logs/crawl_page.log', level=logging.INFO, format=LOG_FORMAT, filemode='a')
-
+cf = config.get_conf()
 db = handle_mysqldb.mysqldb()
+config.set_log('crawl_page.log')
 
 
 def crawl_page():
     try:
-        page = handle_urls.handle_url(start_url, 'byid', 'pagination_container')
+        page = handle_urls.handle_url(cf.get('web', 'start_url'), 'byid', 'pagination_container')
         if page is not None:
             soup = BeautifulSoup(page, 'lxml')
             last_page = soup.find('a', class_='last')
@@ -31,7 +28,7 @@ def crawl_page():
 
 
 if __name__ == '__main__':
-    pool = multiprocessing.Pool(processes=2)
+    pool = multiprocessing.Pool(processes=1)
     pool.apply_async(crawl_page)
 
     logging.info("Started processes")

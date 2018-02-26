@@ -58,8 +58,8 @@ def handle_url(_url, _choose, _value):
     driver = webdriver.Chrome(chrome_options=chrome_options)
     # 隐式等待（可和显式一同使用，取大），推荐使用显式
     # driver.implicitly_wait(15)
-    driver.set_script_timeout(5)
-    driver.set_page_load_timeout(5)
+    driver.set_script_timeout(15)
+    driver.set_page_load_timeout(15)
     try:
         driver.get(_url)
     except Exception, e:
