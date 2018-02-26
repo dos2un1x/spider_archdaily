@@ -56,7 +56,7 @@ def handle_url(_url, _choose, _value):
     chrome_options.add_experimental_option('prefs', prefs)
     chrome_options.add_argument('--headless')
     # linux下配置
-    chrome_options.add_argument('--no-sandbox')
+    # chrome_options.add_argument('--no-sandbox')
     # 是否动态代理IP
     # chrome_options.add_argument('--proxy-server=http://' + AutoProxy(url))
     driver = webdriver.Chrome(chrome_options=chrome_options)
@@ -68,10 +68,7 @@ def handle_url(_url, _choose, _value):
     try:
         driver.get(_url)
     except Exception, e:
-        response = driver.page_source
         pass
-    finally:
-        driver.quit()
     # 显式等待（0.5秒查询一次，查询5秒，共查询10次）
     # EC.presence_of_all_elements_located（复数形式，查到所有的通过）
     # EC.presence_of_element_located（单数）
@@ -84,7 +81,8 @@ def handle_url(_url, _choose, _value):
                 EC.presence_of_element_located((By.CLASS_NAME, _value)))
         else:
             logging.info('please choose crawl conditions')
-        return response
+        return driver.page_source
     except TimeoutException:
         logging.info('WebDriverWait exception url is: ' + _url)
-
+    finally:
+        driver.quit()
