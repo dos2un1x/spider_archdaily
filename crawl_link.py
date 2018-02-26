@@ -16,7 +16,7 @@ config.set_log('crawl_link.log')
 
 def crawl_link(link_url, id):
     try:
-        page = handle_urls.handle_url(link_url, 'byclass', 'js-image-size__link lazy-anchor')
+        page = handle_urls.handle_url(link_url, 'byid', 'single-content')
         if page is not None:
             soup = BeautifulSoup(page, 'lxml')
             # 打印soup内容，格式化输出
