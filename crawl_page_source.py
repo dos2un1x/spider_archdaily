@@ -13,7 +13,7 @@ config.set_log('crawl_page_source.log')
 
 def crawl_page_source(page_url, id):
     try:
-        page = handle_urls.handle_url(page_url, 'byclass', 'afd-search-list__link')
+        page = handle_urls.handle_url(page_url, 'byid', 'pagination_container')
         if page is not None:
             page = pymysql.escape_string(page)
             update_sql = "update page_urls set page_source='%s',status=1 where id=%s" % (page, id)
@@ -26,7 +26,7 @@ def crawl_page_source(page_url, id):
 
 
 if __name__ == '__main__':
-    pool = multiprocessing.Pool(processes=4)
+    pool = multiprocessing.Pool(processes=cf.getint('web','pro_num'))
     select_sql = "select id,page_url from page_urls where status=0"
     res = db.select_mysql(select_sql)
     for row in res:

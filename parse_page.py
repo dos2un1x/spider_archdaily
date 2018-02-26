@@ -27,7 +27,7 @@ def parse_page(page_source, id):
 
 
 if __name__ == '__main__':
-    pool = multiprocessing.Pool(processes=4)
+    pool = multiprocessing.Pool(processes=cf.getint('web','pro_num'))
     select_sql = "select id,page_source from page_urls where status=1"
     res = db.select_mysql(select_sql)
     for row in res:
