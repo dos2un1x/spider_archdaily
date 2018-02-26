@@ -3,14 +3,12 @@ from bs4 import BeautifulSoup
 import multiprocessing
 import logging
 import handle_mysqldb
+import config
 
-# 默认头URL
-basic_url = 'https://www.archdaily.cn'
-
-LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
-logging.basicConfig(filename='/home/spider/logs/parse_page.log', level=logging.INFO, format=LOG_FORMAT, filemode='a')
-
+cf = config.get_conf()
 db = handle_mysqldb.mysqldb()
+config.set_log('parse_page.log')
+
 
 def parse_page(page_source, id):
     try:
@@ -19,8 +17,8 @@ def parse_page(page_source, id):
         if links is not None:
             for link in links:
                 hrefurl = link['href']
-                linkurl = basic_url + hrefurl
-                insert_sql = "insert into link_urls(page_id,link_url) values(%s,'%s')" % (id,linkurl)
+                linkurl = cf.get('web', 'basic_url') + hrefurl
+                insert_sql = "insert into link_urls(page_id,link_url) values(%s,'%s')" % (id, linkurl)
                 db.insert_mysql(insert_sql)
             update_sql = "update page_urls set status=2 where id=%s" % (id)
             db.update_mysql(update_sql)

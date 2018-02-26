@@ -10,9 +10,12 @@ import random
 import requests
 import time
 import logging
+import config
 
 order = "6fe364e27f29ff8e83f0cae046bd18c8";
 apiUrl = "http://dynamic.goubanjia.com/dynamic/get/" + order + ".html";
+
+cf = config.get_conf()
 
 # 动态代理IP
 def AutoProxy(targetUrl):
@@ -57,9 +60,10 @@ def handle_url(_url, _choose, _value):
     # chrome_options.add_argument('--proxy-server=http://' + AutoProxy(url))
     driver = webdriver.Chrome(chrome_options=chrome_options)
     # 隐式等待（可和显式一同使用，取大），推荐使用显式
-    # driver.implicitly_wait(15)
-    driver.set_script_timeout(15)
-    driver.set_page_load_timeout(15)
+    if cf.getboolean('web','timeout'):
+        # driver.implicitly_wait(15)
+        driver.set_script_timeout(cf.getint('web','script_time'))
+        driver.set_page_load_timeout(cf.getint('web','page_load'))
     try:
         driver.get(_url)
     except Exception, e:
@@ -69,10 +73,10 @@ def handle_url(_url, _choose, _value):
     # EC.presence_of_element_located（单数）
     try:
         if _choose == 'byid':
-            WebDriverWait(driver, 5, 0.5).until(
+            WebDriverWait(driver, cf.getint('web','driver_wait'), 0.5).until(
                 EC.presence_of_all_elements_located((By.ID, _value)))
         elif _choose == 'byclass':
-            WebDriverWait(driver, 5, 0.5).until(
+            WebDriverWait(driver, cf.getint('web','driver_wait'), 0.5).until(
                 EC.presence_of_all_elements_located((By.CLASS_NAME, _value)))
         else:
             logging.info('please choose crawl conditions')
