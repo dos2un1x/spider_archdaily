@@ -4,19 +4,19 @@ import multiprocessing
 import logging
 import handle_mysqldb
 import handle_urls
+import config
 
 # 默认头URL
 basic_url = 'https://www.archdaily.cn'
 
-LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
-logging.basicConfig(filename='/home/spider/logs/crawl_link.log', level=logging.INFO, format=LOG_FORMAT, filemode='a')
 
+cf = config.get_conf()
 db = handle_mysqldb.mysqldb()
-
+config.set_log('crawl_link.log')
 
 def crawl_link(link_url, id):
     try:
-        page = handle_urls.handle_url(link_url, 'byid', 'single-content')
+        page = handle_urls.handle_url(link_url, 'byclass', 'js-image-size__link lazy-anchor')
         if page is not None:
             soup = BeautifulSoup(page, 'lxml')
             # 打印soup内容，格式化输出
