@@ -26,10 +26,13 @@ def handle_data(json_data, id):
             insert_sql = "insert into img_urls(data_id,link,url_large,url_slideshow,url_medium,vtype,media_provider_id,caption,image_alt) values(%s,'%s','%s','%s','%s','%s','%s','%s','%s')" % (
                 id, link, url_large, url_slideshow, url_medium, vtype, media_provider_id, caption, image_alt)
             db.insert_mysql(insert_sql)
-            update_sql = "update json_datas set status=1 where id=%s" % (id)
-            db.update_mysql(update_sql)
+        update_sql = "update json_datas set status=1 where id=%s" % (id)
+        status = db.update_mysql(update_sql)
+        if status:
+            logging.info('handle json ok' + str(id))
     except Exception, e:
         logging.info(e)
+        logging.info('handle json error' + str(id))
 
 
 if __name__ == '__main__':
