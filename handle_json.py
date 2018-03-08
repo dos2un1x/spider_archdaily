@@ -16,9 +16,9 @@ def handle_data(json_data, id):
         js = json.loads(json_data)
         for value in js:
             link = value['link']
-            url_large = value['url_large']
-            url_slideshow = value['url_slideshow']
-            url_medium = value['url_medium']
+            url_large = pymysql.escape_string(value['url_large'])
+            url_slideshow = pymysql.escape_string(value['url_slideshow'])
+            url_medium = pymysql.escape_string(value['url_medium'])
             vtype = value['type']
             media_provider_id = value['media_provider_id']
             caption = pymysql.escape_string(value['caption'])
